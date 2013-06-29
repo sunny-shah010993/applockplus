@@ -1,23 +1,31 @@
 package com.thotran.applockplus;
 
-
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
+import android.support.v4.view.ViewPager;
 
-public class MainActivity extends Activity {
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.thotran.applockplus.adapter.ViewPagerAdapter;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TitlePageIndicator;
+
+public class MainActivity extends SherlockFragmentActivity {
+
+	ViewPagerAdapter mPagerAdapter;
+	ViewPager mViewPager;
+	PageIndicator mIndicator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		mPagerAdapter = new ViewPagerAdapter(getApplicationContext(),
+				getSupportFragmentManager());
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mPagerAdapter);
+
+		mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
+		mIndicator.setViewPager(mViewPager);
 	}
 
 }
