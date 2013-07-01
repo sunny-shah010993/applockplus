@@ -1,12 +1,12 @@
 package com.thotran.applockplus.adapter;
 
-import com.thotran.applockplus.MyFragment;
-import com.thotran.applockplus.R;
-
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.thotran.applockplus.MyFragment;
+import com.thotran.applockplus.R;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -26,17 +26,25 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public Fragment getItem(int position) {
-		return MyFragment.getInstance(TITLE_VIEWPAGER[position % TITLE_VIEWPAGER.length]);
+		return MyFragment.getInstance(TITLE_VIEWPAGER[position]);
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		return TITLE_VIEWPAGER[position % TITLE_VIEWPAGER.length];
+		return TITLE_VIEWPAGER[position];
 	}
 
 	@Override
 	public int getCount() {
 		return count;
 	}
+
+	public void setCount(int count) {
+		if (count > 0 && count <= 10) {
+			this.count = count;
+			notifyDataSetChanged();
+		}
+	}
+
 
 }

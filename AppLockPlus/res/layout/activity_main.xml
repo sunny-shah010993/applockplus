@@ -20,7 +20,7 @@
         app:selectedBold="true"
         app:selectedColor="#FF000000" />
 
-    <android.support.v4.view.ViewPager
+    <com.thotran.applockplus.view.UninterceptableViewPager
         android:id="@+id/pager"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
