@@ -1,12 +1,16 @@
 package com.thotran.applockplus.adapter;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.thotran.applockplus.MyFragment;
+import com.thotran.applockplus.AllFragment;
+import com.thotran.applockplus.DownloadFragment;
 import com.thotran.applockplus.R;
+import com.thotran.applockplus.SystemFragment;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -14,19 +18,31 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	public Context context;
 
-	private int count = 0;
+	private ArrayList<Fragment> mArrFragment;
 
-	public ViewPagerAdapter(Context context, FragmentManager fm) {
+	public ViewPagerAdapter(Context context, FragmentManager fm,
+			ArrayList<Fragment> mArrFragment) {
 		super(fm);
 		this.context = context;
 		TITLE_VIEWPAGER = context.getResources().getStringArray(
 				R.array.titleviewpager);
-		count = TITLE_VIEWPAGER.length;
+		this.mArrFragment = mArrFragment;
 	}
 
 	@Override
 	public Fragment getItem(int position) {
-		return MyFragment.getInstance(TITLE_VIEWPAGER[position]);
+		switch (position) {
+		case 0:
+			return AllFragment.newInstance();
+		case 1:
+			return DownloadFragment.newInstance();
+		case 2:
+			return SystemFragment.newInstance();
+		default:
+			break;
+		}
+
+		return null;
 	}
 
 	@Override
@@ -36,15 +52,12 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return count;
+		return mArrFragment.size();
 	}
 
-	public void setCount(int count) {
-		if (count > 0 && count <= 10) {
-			this.count = count;
-			notifyDataSetChanged();
-		}
+	@Override
+	public int getItemPosition(Object object) {
+		return POSITION_NONE;
 	}
-
 
 }

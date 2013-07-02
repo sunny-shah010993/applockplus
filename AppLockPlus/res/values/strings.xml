@@ -10,5 +10,9 @@
     <string name="system_app">System app</string>
     <string name="dowload_app">Download app</string>
     <string name="unknow">Unknow</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_date">Sort by date</string>
+    <string name="check">Check</string>
 
 </resources>
