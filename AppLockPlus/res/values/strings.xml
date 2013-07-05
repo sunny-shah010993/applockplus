@@ -7,12 +7,17 @@
     <string name="all">All</string>
     <string name="download">Downloaded</string>
     <string name="system">System</string>
-    <string name="system_app">System app</string>
-    <string name="dowload_app">Download app</string>
+    <string name="system_app">System application</string>
+    <string name="dowload_app">Download appplication</string>
     <string name="unknow">Unknow</string>
     <string name="sort">Sort</string>
     <string name="sort_by_name">Sort by name</string>
     <string name="sort_by_date">Sort by date</string>
     <string name="check">Check</string>
+    <string name="search">Search</string>
+    <string name="sort_by_name_a_z">Sort by name A-Z</string>
+    <string name="sort_by_name_z_a">Sort by name Z-A</string>
+    <string name="sort_by_date_first">Sort by date first</string>
+    <string name="sort_by_date_last">Sort by date last</string>
 
 </resources>

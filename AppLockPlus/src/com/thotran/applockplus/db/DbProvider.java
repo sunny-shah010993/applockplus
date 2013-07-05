@@ -1,5 +1,6 @@
 package com.thotran.applockplus.db;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,11 +10,14 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.util.Log;
 
 import com.thotran.applockplus.R;
 import com.thotran.applockplus.model.ModelApp;
 
 public class DbProvider {
+
+	private static final String PATH_SYSTEM_APP = "/system/app";
 
 	public static ArrayList<ModelApp> getAllApp(Context context) {
 		ArrayList<ModelApp> mArrApps = new ArrayList<ModelApp>();
@@ -30,7 +34,15 @@ public class DbProvider {
 			item.setName(appInfo.loadLabel(context.getPackageManager())
 					.toString());
 			item.setPackgeName(appInfo.activityInfo.packageName);
-			item.setType(context.getString(R.string.system_app));
+			String pathApp = appInfo.activityInfo.applicationInfo.sourceDir;
+			long time = new File(pathApp).lastModified();
+			item.setTime(time);
+			if (pathApp != null) {
+				if (pathApp.indexOf(PATH_SYSTEM_APP) != -1)
+					item.setType(context.getString(R.string.system_app));
+				else
+					item.setType(context.getString(R.string.dowload_app));
+			}
 			item.setChecked(false);
 			mArrApps.add(item);
 		}
@@ -38,6 +50,7 @@ public class DbProvider {
 		return mArrApps;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static ArrayList<ModelApp> getSystemApp(Context context) {
 		ArrayList<ModelApp> mArrAllApp = getAllApp(context);
 		ArrayList<ModelApp> mArrDownloadApp = getDownloadApp(context);
@@ -56,7 +69,6 @@ public class DbProvider {
 
 	public static ArrayList<ModelApp> getDownloadApp(Context context) {
 		ArrayList<ModelApp> mArrApps = new ArrayList<ModelApp>();
-
 		PackageManager mPackageManager = context.getPackageManager();
 		List<ApplicationInfo> mArrApplicationInfos = mPackageManager
 				.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
@@ -69,6 +81,9 @@ public class DbProvider {
 				item.setPackgeName(appInfo.packageName);
 				item.setType(context.getString(R.string.dowload_app));
 				item.setChecked(false);
+				String pathApp = appInfo.sourceDir;
+				long time = new File(pathApp).lastModified();
+				item.setTime(time);
 				mArrApps.add(item);
 			}
 		}

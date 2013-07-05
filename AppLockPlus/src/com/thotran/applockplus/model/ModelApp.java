@@ -9,6 +9,7 @@ public class ModelApp {
 	public Drawable image;
 	public boolean isChecked;
 	public String packgeName;
+	public long time;
 
 	public String getName() {
 		return name;
@@ -48,6 +49,14 @@ public class ModelApp {
 
 	public void setPackgeName(String packgeName) {
 		this.packgeName = packgeName;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 }

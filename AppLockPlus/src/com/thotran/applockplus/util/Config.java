@@ -10,6 +10,8 @@ public class Config {
 	
 	public static final String KEY_SORT_BY_NAME_Z_A = "key_sort_by_name_z_a";
 	
-	public static final String KEY_SORT_BY_DATE = "key_sort_by_date";
+	public static final String KEY_SORT_BY_DATE_FIRST = "key_sort_by_date_first";
+	
+	public static final String KEY_SORT_BY_DATE_LAST = "key_sort_by_date_last";
 	
 }

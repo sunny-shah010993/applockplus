@@ -2,13 +2,15 @@ package com.thotran.applockplus.adapter;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -16,7 +18,7 @@ import android.widget.ToggleButton;
 import com.thotran.applockplus.R;
 import com.thotran.applockplus.model.ModelApp;
 
-public class AppAdapter extends ArrayAdapter<ModelApp> {
+public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 
 	private Context mContext;
 
@@ -57,6 +59,44 @@ public class AppAdapter extends ArrayAdapter<ModelApp> {
 		}
 
 		return view;
+	}
+
+	@Override
+	public Filter getFilter() {
+		return new Filter() {
+			@SuppressWarnings("unchecked")
+			@Override
+			protected void publishResults(CharSequence constraint,
+					FilterResults results) {
+				if (results.count == 0)
+					notifyDataSetInvalidated();
+				else {
+					mArrApps = (ArrayList<ModelApp>) results.values;
+					notifyDataSetChanged();
+				}
+			}
+
+			@SuppressLint("DefaultLocale")
+			@Override
+			protected FilterResults performFiltering(CharSequence constraint) {
+				FilterResults mFilterResults = new FilterResults();
+				if (constraint != null || constraint.length() > 0) {
+					ArrayList<ModelApp> mNewArrApp = new ArrayList<ModelApp>();
+					for (ModelApp item : mArrApps) {
+						if (item.getName().toUpperCase().startsWith(constraint.toString().toUpperCase()))
+							mNewArrApp.add(item);
+					}
+					mFilterResults.values = mNewArrApp;
+					mFilterResults.count = mNewArrApp.size();
+					Log.e("mNewArrApp.size()", mNewArrApp.size() + "");
+				} else {
+					mFilterResults.values = mArrApps;
+					mFilterResults.count = mArrApps.size();
+				}
+
+				return mFilterResults;
+			}
+		};
 	}
 
 	public class ViewHolder {
