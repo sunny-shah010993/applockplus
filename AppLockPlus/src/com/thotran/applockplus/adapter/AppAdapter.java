@@ -24,12 +24,17 @@ public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 
 	private ArrayList<ModelApp> mArrApps;
 
+	private ArrayList<ModelApp> mArrAppsOrginal = new ArrayList<ModelApp>();
+
 	private ViewHolder mViewHolder;
+
+	private final Object mLock = new Object();
 
 	public AppAdapter(Context context, ArrayList<ModelApp> objects) {
 		super(context, R.layout.item_app, objects);
 		mContext = context;
 		mArrApps = objects;
+		mArrAppsOrginal.addAll(objects);
 	}
 
 	@Override
@@ -49,7 +54,7 @@ public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 		} else
 			mViewHolder = (ViewHolder) view.getTag();
 
-		if (position > 0 && position < mArrApps.size()) {
+		if (position >= 0 && position < mArrApps.size()) {
 			ModelApp item = mArrApps.get(position);
 
 			mViewHolder.image.setImageDrawable(item.getImage());
@@ -68,32 +73,44 @@ public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 			@Override
 			protected void publishResults(CharSequence constraint,
 					FilterResults results) {
-				if (results.count == 0)
+				if (results.count == 0) {
 					notifyDataSetInvalidated();
-				else {
-					mArrApps = (ArrayList<ModelApp>) results.values;
+				} else {
 					notifyDataSetChanged();
+					clear();
+					final ArrayList<ModelApp> mArrApps = (ArrayList<ModelApp>) results.values;
+					addAll(mArrApps);
 				}
 			}
 
+			@SuppressWarnings("null")
 			@SuppressLint("DefaultLocale")
 			@Override
 			protected FilterResults performFiltering(CharSequence constraint) {
 				FilterResults mFilterResults = new FilterResults();
+				ArrayList<ModelApp> mNewArrApp = new ArrayList<ModelApp>();
 				if (constraint != null || constraint.length() > 0) {
-					ArrayList<ModelApp> mNewArrApp = new ArrayList<ModelApp>();
-					for (ModelApp item : mArrApps) {
-						if (item.getName().toUpperCase().startsWith(constraint.toString().toUpperCase()))
-							mNewArrApp.add(item);
+					synchronized (mLock) {
+						for (ModelApp item : mArrAppsOrginal) {
+							if (item.getName()
+									.toUpperCase()
+									.startsWith(
+											constraint.toString().toUpperCase()))
+								mNewArrApp.add(item);
+						}
+						mFilterResults.values = mNewArrApp;
+						mFilterResults.count = mNewArrApp.size();
+						Log.e("mNewArrApp.size()", mNewArrApp.size() + "");
 					}
-					mFilterResults.values = mNewArrApp;
-					mFilterResults.count = mNewArrApp.size();
-					Log.e("mNewArrApp.size()", mNewArrApp.size() + "");
-				} else {
-					mFilterResults.values = mArrApps;
-					mFilterResults.count = mArrApps.size();
-				}
 
+				} else {
+					synchronized (mLock) {
+						mFilterResults.values = mArrAppsOrginal;
+						mFilterResults.count = mArrAppsOrginal.size();
+					}
+				}
+				Log.e("mNewArrApp", mNewArrApp.size() + "");
+				Log.e("mArrOrginal", mArrAppsOrginal.size() + "");
 				return mFilterResults;
 			}
 		};

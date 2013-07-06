@@ -14,4 +14,11 @@ public class Config {
 	
 	public static final String KEY_SORT_BY_DATE_LAST = "key_sort_by_date_last";
 	
+	public static final String KEY_ALL_APP = "key_all_app";
+	
+	public static final String KEY_DOWNLOAD_APP = "key_download_app";
+	
+	public static final String KEY_SYSTEM_APP = "key_system_app";
+	
+	
 }

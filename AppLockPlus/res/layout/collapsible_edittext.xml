@@ -3,4 +3,7 @@
     android:id="@+id/etextSearch"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:hint="Search"/>
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:textColor="@color/color_white"
+    android:hint="@string/hint_search_app"/>

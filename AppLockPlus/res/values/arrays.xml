@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="titleviewpager">
+    <string-array name="listNavigation">
         <item>@string/all</item>
         <item>@string/download</item>
         <item>@string/system</item>
