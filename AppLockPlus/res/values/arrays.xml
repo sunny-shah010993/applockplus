@@ -6,5 +6,9 @@
         <item>@string/download</item>
         <item>@string/system</item>
     </string-array>
+    <string-array name="listDrawer">
+        <item>@string/home_page</item>
+        <item>@string/security_settings</item>
+    </string-array>
 
 </resources>

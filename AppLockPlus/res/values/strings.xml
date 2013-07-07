@@ -20,6 +20,13 @@
     <string name="sort_by_date_first">Sort by date first</string>
     <string name="sort_by_date_last">Sort by date last</string>
     
+    
+    <!--Drawer item  -->
+    <string name="home_page">Home page</string>
+    <string name="security_settings">Security settings</string>
+     <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    
     <!-- hint -->
     <string name="hint_search_app">Search application</string>
 
