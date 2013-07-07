@@ -4,31 +4,31 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnActionExpandListener;
+import com.actionbarsherlock.widget.SearchView;
+import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
+import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.thotran.applockplus.adapter.AppAdapter;
 import com.thotran.applockplus.db.DbProvider;
 import com.thotran.applockplus.model.ModelApp;
 import com.thotran.applockplus.pref.BooleanPref;
+import com.thotran.applockplus.pref.IntPref;
 import com.thotran.applockplus.util.Config;
 import com.thotran.applockplus.util.Util;
 
 public class MainActivity extends SherlockActivity implements
-		OnNavigationListener {
+		OnNavigationListener, OnQueryTextListener, OnSuggestionListener {
 
 	private String[] listNavigation;
 
@@ -36,13 +36,13 @@ public class MainActivity extends SherlockActivity implements
 
 	private ArrayList<ModelApp> mArrApps = new ArrayList<ModelApp>();
 
-	private ActionMode mActionMode;
-
 	private ActionBar mActionBar;
 
 	private AppAdapter mAppAdapter;
 
 	private ListView mListView;
+
+	private static final int ID_MENU_SEARCH = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,24 +58,24 @@ public class MainActivity extends SherlockActivity implements
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 
+		mActionBar = getSupportActionBar();
+		mActionBar.setSelectedNavigationItem(IntPref.getPreference(mContext,
+				Config.KEY_POSITION_NAVIGATION, 0));
 		// ----------
 		mListView = (ListView) findViewById(R.id.listApp);
-		mAppAdapter = new AppAdapter(mContext, mArrApps);
-		mListView.setAdapter(mAppAdapter);
-
 	}
 
 	public void initArrApps() {
 		if (BooleanPref.getPreference(mContext, Config.KEY_ALL_APP, true)) {
-			mArrApps = DbProvider.getAllApp(mContext);
+			mArrApps.addAll(DbProvider.getAllApp(mContext));
 		}
 
 		if (BooleanPref.getPreference(mContext, Config.KEY_DOWNLOAD_APP, false)) {
-			mArrApps = DbProvider.getDownloadApp(mContext);
+			mArrApps.addAll(DbProvider.getDownloadApp(mContext));
 		}
 
 		if (BooleanPref.getPreference(mContext, Config.KEY_SYSTEM_APP, false)) {
-			mArrApps = DbProvider.getSystemApp(mContext);
+			mArrApps.addAll(DbProvider.getSystemApp(mContext));
 		}
 	}
 
@@ -83,33 +83,37 @@ public class MainActivity extends SherlockActivity implements
 
 	}
 
-	public void sortAll() {
-		if (BooleanPref.getPreference(mContext, Config.KEY_SORT_BY_NAME_A_Z,
-				true)) {
-			Util.sortAZ(mArrApps);
-		}
-
-		if (BooleanPref.getPreference(mContext, Config.KEY_SORT_BY_NAME_Z_A,
-				false)) {
-			Util.sortZA(mArrApps);
-		}
-
-		if (BooleanPref.getPreference(mContext, Config.KEY_SORT_BY_DATE_FIRST,
-				false)) {
-			Util.sortFirstDate(mArrApps);
-		}
-
-		if (BooleanPref.getPreference(mContext, Config.KEY_SORT_BY_DATE_LAST,
-				false)) {
-			Util.sortLastDate(mArrApps);
-		}
-		mAppAdapter.notifyDataSetChanged();
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		SearchView searchView = new SearchView(getSupportActionBar()
+				.getThemedContext());
+		searchView.setQueryHint(getString(R.string.hint_search_app));
+		searchView.setOnQueryTextListener(this);
+		searchView.setOnSuggestionListener(this);
+		menu.add(1, ID_MENU_SEARCH, 0, getString(R.string.search))
+				.setIcon(android.R.drawable.ic_menu_search)
+				.setActionView(searchView)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.main, menu);
+		MenuItem item = menu.findItem(ID_MENU_SEARCH);
+		item.setOnActionExpandListener(new OnActionExpandListener() {
+			@Override
+			public boolean onMenuItemActionExpand(MenuItem item) {
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionCollapse(MenuItem item) {
+				mArrApps.clear();
+				initArrApps();
+				Util.sortAll(mContext, mArrApps);
+				mAppAdapter.notifyDataSetChanged();
+				return true;
+			}
+		});
 		return true;
 	}
 
@@ -117,8 +121,13 @@ public class MainActivity extends SherlockActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case R.id.menu_search:
-			mActionMode = startActionMode(new AnActionMode());
+		case android.R.id.home:
+			Toast.makeText(mContext, "home", Toast.LENGTH_SHORT).show();
+			break;
+
+		case ID_MENU_SEARCH:
+			Util.sortAll(mContext, mArrApps);
+			mAppAdapter.notifyDataSetChanged();
 			break;
 		case R.id.menu_sort_by_name:
 			if (BooleanPref.getPreference(mContext,
@@ -182,23 +191,23 @@ public class MainActivity extends SherlockActivity implements
 				Toast.makeText(mContext, getString(R.string.sort_by_date_last),
 						Toast.LENGTH_SHORT).show();
 			}
-
 			break;
 
 		default:
 			break;
 		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-
+		IntPref.setPreference(mContext, Config.KEY_POSITION_NAVIGATION,
+				itemPosition);
 		if (listNavigation[itemPosition].equals(getString(R.string.all))) {
 			mArrApps.clear();
-			mArrApps.addAll(DbProvider.getAllApp(mContext));
-			sortAll();
+			mArrApps = DbProvider.getAllApp(mContext);
+			mAppAdapter = new AppAdapter(mContext, mArrApps);
+			Util.sortAll(mContext, mArrApps);
 			mAppAdapter.notifyDataSetChanged();
 			BooleanPref.setPreference(mContext, Config.KEY_ALL_APP, true);
 			BooleanPref.setPreference(mContext, Config.KEY_DOWNLOAD_APP, false);
@@ -206,71 +215,46 @@ public class MainActivity extends SherlockActivity implements
 		} else if (listNavigation[itemPosition]
 				.equals(getString(R.string.download))) {
 			mArrApps.clear();
-			mArrApps.addAll(DbProvider.getDownloadApp(mContext));
-			sortAll();
+			mArrApps = DbProvider.getDownloadApp(mContext);
+			mAppAdapter = new AppAdapter(mContext, mArrApps);
+			Util.sortAll(mContext, mArrApps);
 			mAppAdapter.notifyDataSetChanged();
 			BooleanPref.setPreference(mContext, Config.KEY_ALL_APP, false);
 			BooleanPref.setPreference(mContext, Config.KEY_DOWNLOAD_APP, true);
 			BooleanPref.setPreference(mContext, Config.KEY_SYSTEM_APP, false);
 		} else {
 			mArrApps.clear();
-			mArrApps.addAll(DbProvider.getSystemApp(mContext));
-			sortAll();
+			mArrApps = DbProvider.getSystemApp(mContext);
+			mAppAdapter = new AppAdapter(mContext, mArrApps);
+			Util.sortAll(mContext, mArrApps);
 			mAppAdapter.notifyDataSetChanged();
 			BooleanPref.setPreference(mContext, Config.KEY_ALL_APP, false);
 			BooleanPref.setPreference(mContext, Config.KEY_DOWNLOAD_APP, false);
 			BooleanPref.setPreference(mContext, Config.KEY_SYSTEM_APP, true);
 		}
+		mListView.setAdapter(mAppAdapter);
+		return true;
+	}
 
+	@Override
+	public boolean onSuggestionSelect(int position) {
 		return false;
 	}
 
-	public class AnActionMode implements ActionMode.Callback {
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View view = inflater.inflate(R.layout.collapsible_edittext, null);
-			mode.setCustomView(view);
-			EditText mEditText = (EditText) view.findViewById(R.id.etextSearch);
-			mEditText.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void onTextChanged(CharSequence arg0, int arg1,
-						int arg2, int arg3) {
-					mAppAdapter.getFilter().filter(arg0.toString());
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence arg0, int arg1,
-						int arg2, int arg3) {
-
-				}
-
-				@Override
-				public void afterTextChanged(Editable arg0) {
-
-				}
-			});
-			return true;
-		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			// TODO Auto-generated method stub
-
-		}
-
+	@Override
+	public boolean onSuggestionClick(int position) {
+		return false;
 	}
 
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		mAppAdapter.getFilter().filter(newText);
+		return true;
+	}
+	
 }

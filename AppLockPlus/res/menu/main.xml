@@ -1,11 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_search"
-        android:icon="@android:drawable/ic_menu_search"
-        android:showAsAction="always|collapseActionView"
-        android:title="@string/search"/>
-    <item
         android:id="@+id/menu_sort"
         android:icon="@android:drawable/ic_menu_sort_alphabetically"
         android:showAsAction="always"

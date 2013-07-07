@@ -20,5 +20,7 @@ public class Config {
 	
 	public static final String KEY_SYSTEM_APP = "key_system_app";
 	
+	public static final String KEY_POSITION_NAVIGATION = "key_position_navigation";
+	
 	
 }

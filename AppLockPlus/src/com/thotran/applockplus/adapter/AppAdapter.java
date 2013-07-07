@@ -17,6 +17,7 @@ import android.widget.ToggleButton;
 
 import com.thotran.applockplus.R;
 import com.thotran.applockplus.model.ModelApp;
+import com.thotran.applockplus.util.Util;
 
 public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 
@@ -94,10 +95,11 @@ public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 						for (ModelApp item : mArrAppsOrginal) {
 							if (item.getName()
 									.toUpperCase()
-									.startsWith(
+									.contains(
 											constraint.toString().toUpperCase()))
 								mNewArrApp.add(item);
 						}
+						Util.sortAll(mContext, mNewArrApp);
 						mFilterResults.values = mNewArrApp;
 						mFilterResults.count = mNewArrApp.size();
 						Log.e("mNewArrApp.size()", mNewArrApp.size() + "");
@@ -109,8 +111,6 @@ public class AppAdapter extends ArrayAdapter<ModelApp> implements Filterable {
 						mFilterResults.count = mArrAppsOrginal.size();
 					}
 				}
-				Log.e("mNewArrApp", mNewArrApp.size() + "");
-				Log.e("mArrOrginal", mArrAppsOrginal.size() + "");
 				return mFilterResults;
 			}
 		};
